@@ -4,8 +4,8 @@ date = "2023-09-16"
 description = "Haskell: 0 to Advent of Code"
 +++
 
-A couple of days ago, having a bit of free time and no chance to spend it outside
-because of the weather, I decided to freshen up my Haskell by going through some
+A couple of days ago, having a bit of free time and with no chance of spending it
+outside because of the weather, I decided to freshen up my Haskell by going through some
 of last year's [Advent of code](https://adventofcode.com) exercises.
 Since I've had lots of fun, I've decided to write this post in an attempt to
 strengthen my knowledge of Haskell, as well as hopefully entice you
