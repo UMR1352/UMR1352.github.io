@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    
+    
+    
+    <title>
+         An Introduction to Haskell
+        
+    </title>
+
+        
+            <meta property="og:title" content="An Introduction to Haskell" />
+        
+     
+
+     
+         
+             <meta property="og:description" content="Haskell: 0 to Advent of Code" />
+         
+     
+
+     
+         
+             <meta name="description" content="Haskell: 0 to Advent of Code" />
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=favicon-32x32.png />
+    
+
+    
+    
+        <link href=https://blog.emarconi.xyz/fonts.css rel="stylesheet" />
+    
+
+    
+    
+
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Enrico Marconi" href="https://blog.emarconi.xyz/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://blog.emarconi.xyz/theme/light.css />
+        <link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://blog.emarconi.xyz/theme/dark.css" />
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://blog.emarconi.xyz/main.css />
+
+    
+
+    <script src=https://blog.emarconi.xyz/js/feather.min.js></script>
+</head>
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        <a href=https:&#x2F;&#x2F;blog.emarconi.xyz>Enrico Marconi</a>
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;umr1352&#x2F;" class="social">
+                <img alt=github src="/social_icons/github.svg">
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;enrico-marconi&#x2F;" class="social">
+                <img alt=linkedin src="/social_icons/linkedin.svg">
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=&#x2F;posts style="margin-left: 0.7em">&#x2F;posts</a>
+        
+            <a href=&#x2F;projects style="margin-left: 0.7em">&#x2F;projects</a>
+        
+            <a href=&#x2F;about style="margin-left: 0.7em">&#x2F;about</a>
+        
+    </nav>
+
+    
+    <nav>
+        | <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+        <script src=https://blog.emarconi.xyz/js/themetoggle.js></script>
+    </nav>
+    
+</header>
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        An Introduction to Haskell<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2023-09-16</time>
+                    
+
+                    
+                </div>
+        </div>
+
+        
+
+        
+        
+
+        <section class="body">
+            <p>A couple of days ago, having a bit of free time and with no chance of spending it
+outside because of the weather, I decided to freshen up my Haskell by going through some
+of last year's <a href="https://adventofcode.com">Advent of code</a> exercises.
+Since I've had lots of fun, I've decided to write this post in an attempt to
+strengthen my knowledge of Haskell, as well as hopefully entice you
+gentle-reader into trying Haskell yourself.</p>
+<p>Starting off with the very basics, we are going to learn everything we need to
+solve <a href="https://adventofcode.com/2022/day/9">AoC-2022 day 9</a>: reading data from a
+file, parsing it into a custom defined data type and writing a slick and
+readable solution.
+Brew yourself some coffee and sit tight because this is gonna be one hell of a
+ride.</p>
+<h1 id="what-the-hell-haskell-even-is">What the hell Haskell even is</h1>
+<p>For those who have never heard of it before, Haskell is a <strong>purely functional
+programming language</strong>, which is just a fancy way of saying that it involves
+lots of functions that pretty much behave like mathematical functions; they take
+some inputs and return an output, that's it, nothing more. In fact, Haskell's
+functions don't have <strong>side-effects</strong>, therefore you are guaranteed to always
+obtain the same result with the same inputs, no matter what. This cute little
+property is called <strong>referential transparency</strong> and besides sounding sick as
+fuck, it allows you to better reason about the correctness of your code.</p>
+<p>Furthermore Haskell is <strong>statically typed</strong>. The compiler ensures the type
+safety of your programs, catching lots of bugs at compile time and freeing you
+from the hassle and pain of unexpected runtime errors (at least most of them).
+To top it all off, you don't have to worry anymore about <code>null</code> dereferences,
+they are just not possible in Haskell.</p>
+<p>Haskell is <strong>lazy</strong>; functions aren't executed until their result is needed,
+which among other things, enables us to write <strong>infinite</strong> data structures.</p>
+<p>If this sounds cool enough for you, let's start off by dipping our toes in some
+Haskell code!</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> If you wish to follow along, get your favourite text editor ready
+and install GHC with <a href="https://www.haskell.org/ghcup/">ghcup</a>. Done that, you
+can start an interactive session with <code>ghci</code> and load your code with
+<code>:l path/to/file.hs</code>. All set!</p>
+</blockquote>
+<h1 id="the-basics">The basics</h1>
+<p>Being a functional programming language, functions are unsurprisingly Haskell's
+bread and butter. This means that there's nothing we can do but to start with
+them.</p>
+<blockquote>
+<p>Wait, what?! No &quot;Hello, World&quot;?! Is this guy legit?!</p>
+<p>-- <em>An impatient reader</em></p>
+</blockquote>
+<p>Well, as I've told you before, Haskell's functions don't have side-effects and
+printing something on the screen is definitely a side-effect. This doesn't mean
+Haskell can't print to the screen, but its a bit more convoluted than a simple
+<code>print &quot;Hello, World!&quot;</code>. We'll get there eventually, pinky promise!</p>
+<h2 id="functions">Functions</h2>
+<p>Here is the full definition of a function that takes two integers and
+returns their sum:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">mySum </span><span style="color:#ff7733;">:: Int -&gt; Int -&gt; Int
+</span><span>mySum a b </span><span style="color:#f29668;">=</span><span> a </span><span style="color:#f29668;">+</span><span> b
+</span></code></pre>
+<p>I know the syntax might seem daunting at first, but I can assure you will get
+used to it and you might even end up liking it a lot as it comes with some nice
+little perks. But first, let's break it down.</p>
+<p>The first line is the function's type declaration. It's optional, you don't have
+to write it if you don't want to. The compiler can infer it for you, but it's
+usually good practice to always write it down since it's useful to better
+understand your code.</p>
+<p>Functions' type signatures are <strong>right-associative</strong>. In the case of <code>mySum</code> it
+means it can be rewritten as:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">mySum </span><span style="color:#ff7733;">:: Int -&gt;</span><span> (</span><span style="color:#ff7733;">Int -&gt; Int</span><span>)
+</span></code></pre>
+<p>which can be read as &quot;<code>mySum</code> takes an integer and returns a function that 
+takes an integer and returns another integer&quot;. In Haskell-lingo we say that
+functions are <strong>curried</strong>, that is functions of multiple arguments are
+transformed into functions that take a single argument and return a function of
+one argument that returns a function of one argument that ... and so on until
+they return a value. This sounds pretty dumb but it's actually very powerful as
+it allows for extreamely simple partial application of functions. You just have
+to omit the remaining arguments! Here's an example you can try in ghci:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>map (</span><span style="color:#f29718;">1 </span><span style="color:#f29668;">+</span><span>) [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>] </span><span style="font-style:italic;color:#5c6773;">-- returns [2, 3, 4]
+</span></code></pre>
+<p>Here we have just applied the function <code>(1 +)</code> to every element of the list,
+building a new list from it. The function <code>+</code> has type <code>Int -&gt; Int -&gt; Int</code> but 
+we partially apply it, obtaining a function with type <code>Int -&gt; Int</code>, that we can
+use to map over a list.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> You can check the type of any expression with ghci just by typing
+<code>:t &lt;expr&gt;</code>.</p>
+</blockquote>
+<p>Besides partial applications, this example shows us how functions are invoked:
+just by following the function's name with all its arguments. Moreover we have
+seen how to pass functions to other functions as arguments. That is, we 
+discovered that <strong>functions are first-class citizens</strong>!</p>
+<p>Something's strange though. How come the <code>+</code> function has one argument on its
+left and the other on its right? Aren't arguments supposed to go after the
+function's name? Usually that's the case, but in order to make some function
+applications more readable, for instance with operators such as <code>+, -, *, &amp;&amp;, ||, ...</code>, Haskell allows to define functions that are <strong>infix</strong> by default. <code>+</code> is
+one such case. Anyway, every Haskell binary function can be written in infix
+style by wrapping its name in back-quotes: <code>1 `mySum` 2</code> and all infix
+functions can be used prefix style like this <code>(+) 1 2</code>.</p>
+<h2 id="type-classes-and-type-constraints">Type classes and type constraints</h2>
+<p>Another thing an astute reader might call me out for is saying that the type of 
+the <code>+</code> function is not <code>Int -&gt; Int -&gt; Int</code>, and she would be perfectly right!
+Let's check it with ghci:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t </span><span style="color:#ffb454;">(+)
+</span><span style="color:#ffb454;">(+) </span><span style="color:#ff7733;">::</span><span> (</span><span style="color:#ff7733;">Num </span><span>a) </span><span style="color:#ff7733;">=&gt; </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>a
+</span></code></pre>
+<p>Weird new syntax alert, but nothing too crazy to worry about. A
+lowercase letter in a type signature is called a <strong>type parameter</strong>, as it's not
+a <strong>concrete type</strong> like <code>Int</code>, <code>Double</code> or <code>Char</code>, but a placeholder for any
+concrete type. The <code>(Num a) =&gt; </code> part is a <strong>type constraint</strong> that states that type
+parameter <code>a</code> can be any type that is an instance of the <code>Num</code> <strong>type class</strong>.</p>
+<p>A type class is just a mechanism that ensures certain functions are available
+for any given type implementing that class. The <code>Num</code> type class for instance
+provides all the functions we need to operate on numbers, while the <code>Eq</code>
+type class assures that two values of a type can be compared for equality.</p>
+<p>Haskell has lots of type classes, some of them will be discussed later, some
+won't. The point is: type classes are a very powerful tool, that
+enables us to write polymorphic code that is easy to reason about.</p>
+<h2 id="working-with-functions">Working with Functions</h2>
+<p>We have seen how to define and invoke simple functions in Haskell, but that's
+just the very tip of the iceberg. Let's delve deeper!</p>
+<h3 id="pattern-matching-and-function-s-guards">Pattern matching and function's guards</h3>
+<p>Let's have a look at a possible definition for a factorial function:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">factorial </span><span style="color:#ff7733;">:: Int -&gt; Int
+</span><span>factorial </span><span style="color:#f29718;">0 </span><span style="color:#f29668;">= </span><span style="color:#f29718;">1
+</span><span>factorial x </span><span style="color:#f29668;">=</span><span> x * factorial (x </span><span style="color:#f29668;">- </span><span style="color:#f29718;">1</span><span>)
+</span></code></pre>
+<p>Here we see how Haskell allows us to split a function's definition in multiple
+&quot;branches&quot; using patter-matching on its arguments. The first branch will be
+called whenever <code>factorial</code>'s argument will match patter <code>0</code>, that is when the
+argument is <code>0</code>. The other branch will be called in all other cases.</p>
+<p>Another thing we notice is that <code>factorial</code> is defined as a recursive function,
+the result is calculated by repeatedly calling the function, until a base case
+is hit. Recursion is Haskell's main tool to achieve &quot;loops&quot;. Remember: Haskell
+is purely functional, it doesn't have side-effects, thus it has no concept of
+variables nor assignments, hence you can't write a loop as you normally would in
+an imperative language such as C, Java or Rust. Thinking in terms of recursive
+functions might be hard at first, but you shouldn't get discouraged. Moreover,
+most of the time, the recursiveness of a function's definition will be
+abstracted away using other fuctions. For instance, our <code>factorial</code> function
+can be rewritten as:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">factorial </span><span style="color:#ff7733;">:: Int -&gt; Int
+</span><span>factorial x </span><span style="color:#f29668;">=</span><span> product [</span><span style="color:#f29718;">1</span><span style="color:#f29668;">..</span><span>x]
+</span></code></pre>
+<p>Wow, this definition is even more concise and readable than the previous one.
+Sweet!</p>
+<p>Split function's definition in multiple branches based on
+the &quot;shape&quot; of the function's arguments with pattern-matching is not always
+what one wants. We can do something similar but using the
+value of the arguments instead of their shape. This mechanism is called
+<strong>function's guards</strong> and it looks like this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">fib </span><span style="color:#ff7733;">:: Int -&gt; Int
+</span><span>fib n
+</span><span>  </span><span style="color:#f29668;">|</span><span> n </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0 </span><span style="color:#f29668;">= </span><span style="color:#f29718;">0
+</span><span>  </span><span style="color:#f29668;">|</span><span> n </span><span style="color:#f29668;">== </span><span style="color:#f29718;">1 </span><span style="color:#f29668;">= </span><span style="color:#f29718;">1
+</span><span>  </span><span style="color:#f29668;">|</span><span> otherwise </span><span style="color:#f29668;">=</span><span> fib (n </span><span style="color:#f29668;">- </span><span style="color:#f29718;">1</span><span>) </span><span style="color:#f29668;">+</span><span> fib (n </span><span style="color:#f29668;">- </span><span style="color:#f29718;">2</span><span>)
+</span></code></pre>
+<p>Each branch is introduced by a pipe <code>|</code> and a predicate (a function that returns
+a boolean value), and is invoked only if the predicate is true. The default
+case, <code>otherwise</code>, is used when none of the predicates are true.</p>
+<h3 id="higher-order-functions-lambdas-and-point-free-style">Higher-order functions, lambdas and point-free style</h3>
+<p>Previously we've said that Haskell's functions are first class citizens and that
+they can be passed around as arguments to other functions. These functions, the
+ones that either take other functions as their arguments or that returns them,
+are called <strong>higher-order functions</strong>.</p>
+<blockquote>
+<p>Dude! How many times did you write &quot;function&quot; in two phrases?!</p>
+</blockquote>
+<p>Here's a simple example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">applyTwice </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>a) </span><span style="color:#ff7733;">-&gt; </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>a
+</span><span>applyTwice f x </span><span style="color:#f29668;">=</span><span> f (f x)
+</span></code></pre>
+<p><code>applyTwice</code>, as the name suggests, takes a function <code>f</code> of type <code>a -&gt; a</code>, an
+argument <code>x</code> of type <code>a</code>, and returns the result of applying <code>f</code> twice to <code>x</code>.
+Let's see it in action:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> doubleMe x </span><span style="color:#f29668;">=</span><span> x * </span><span style="color:#f29718;">2
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> applyTwice doubleMe </span><span style="color:#f29718;">2
+</span><span style="color:#f29718;">8
+</span></code></pre>
+<p>Wouldn't it be nice to have a way to pass to <code>applyTwice</code> a function without having
+to define it first, like we did with <code>doubleMe</code>? Well, Javascript (<em>bane of my
+existance™</em>) plus plenty of other languages can define anonymous functions, so
+Haskell should too, right? You bet it does, you little twerp. Haskell has
+lambdas and they can be used like this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> applyTwice (</span><span style="color:#f29668;">\</span><span>x </span><span style="color:#f29668;">-&gt;</span><span> x * </span><span style="color:#f29718;">2</span><span>) </span><span style="color:#f29718;">2
+</span><span style="color:#f29718;">8
+</span></code></pre>
+<p>Lambdas are introduced with the <code>\</code> character, because it looks like the letter λ (in
+your dreams it does, lol), followed by the arguments declaration and finally the
+lambda's body after an arrow. They work the same way normal functions do, but
+are a little less verbose to write. You should be somewhat accustomed to them,
+unless you are a Python programmer, in that case, <em>oh poor fellow</em>.</p>
+<p>Usually, Haskell programmers, writes their functions as a composition of other
+functions, without explicitely mentioning the actual arguments they will be
+applied to. This is usually refered to as <strong>point-free style</strong>. Basically, it
+consists of using lots of <code>.</code> to make your code look cool af. Here's an example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">add2Mult3 </span><span style="color:#ff7733;">:: </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>a
+</span><span>add2Mult3 </span><span style="color:#f29668;">=</span><span> (</span><span style="color:#f29718;">3</span><span>*) </span><span style="color:#f29668;">.</span><span> (</span><span style="color:#f29718;">2</span><span style="color:#f29668;">+</span><span>)
+</span></code></pre>
+<p>This function simply compose two other functions, one adds <code>2</code> to its argument
+and the other multiply its argument by <code>3</code>. To compose the two functions the
+function composition operator <code>(.)</code> is used. Its definition looks like this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">(.) </span><span style="color:#ff7733;">::</span><span> (b </span><span style="color:#ff7733;">-&gt; </span><span>c) </span><span style="color:#ff7733;">-&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt; </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>c
+</span><span>f </span><span style="color:#f29668;">.</span><span> g </span><span style="color:#f29668;">= \</span><span>x </span><span style="color:#f29668;">-&gt;</span><span> f (g x)
+</span></code></pre>
+<p>Later on, we'll make extensive use of this.</p>
+<h2 id="working-on-lists">Working on lists</h2>
+<p>If functions are the number one tool to a Haskell programmer, <strong>lists</strong> come close
+second. Haskell's lists store many, possibly infinite, values of a single type,
+therefore lists are a <strong>homogenous</strong> data structure.</p>
+<p>Lists have type <code>[a]</code> where <code>a</code> can be any concrete type. The most simple way to
+create a list is to simply write it down like so: <code>[1, 2, 3, 4, 5]</code>; this
+creates a list of <code>Int</code>s. Interestingly enough, Haskell's <code>String</code>s are
+themselves lists! For instance, <code>&quot;hello!&quot;</code> is the same thing as <code>['h', 'e', 'l', 'l', 'o', '!']</code>. Let's have a look at some basic operation we can do on
+lists.</p>
+<p>The <code>(++)</code> operator puts two lists together:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t </span><span style="color:#ffb454;">(++)
+</span><span style="color:#ffb454;">(++) </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [a]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>] </span><span style="color:#f29668;">++</span><span> [</span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">5</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span>]
+</span><span>[</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">5</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span>]
+</span></code></pre>
+<p>The <code>(:)</code> operator prepends an element to the head of a list:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t </span><span style="color:#ffb454;">(:)
+</span><span style="color:#ffb454;">(:) </span><span style="color:#f29668;">::</span><span> a </span><span style="color:#f29668;">-&gt;</span><span> [a] </span><span style="color:#f29668;">-&gt;</span><span> [a]
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">0 </span><span style="color:#f29668;">:</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span>[</span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span></code></pre>
+<p>Moreover, the <code>(:)</code> operator can be used to pattern-match lists:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">head </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt; </span><span>a
+</span><span>head (x</span><span style="color:#f29668;">:</span><span>_xs) </span><span style="color:#f29668;">=</span><span> x
+</span></code></pre>
+<p>Here we re-define function <code>head</code> (which is already provided by Haskell) using
+<code>:</code> to extract the very first element from the list's remaining elements. This
+is possible because the syntax <code>[1, 2, 3]</code> is just syntactic-sugar for
+<code>1:2:3:[]</code>.</p>
+<p>Similar to <code>head</code> we have:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#ff7733;">let</span><span> xs </span><span style="color:#f29668;">=</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> tail xs
+</span><span>[</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> last xs
+</span><span style="color:#f29718;">3
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> init xs
+</span><span>[</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> length xs
+</span><span style="color:#f29718;">3
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> null xs
+</span><span style="color:#f29718;">False
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> null </span><span style="color:#f29718;">[]
+</span><span style="color:#f29718;">True
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">2 </span><span style="color:#f29668;">`elem`</span><span> xs
+</span><span style="color:#f29718;">True
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">4 </span><span style="color:#f29668;">`elem`</span><span> xs
+</span><span style="color:#f29718;">False
+</span></code></pre>
+<p>And many many more. Have a look at the
+<a href="https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-List.html">Data.List</a>
+module for a complete list of every list operations.</p>
+<p>Another way to create lists is using <strong>ranges</strong>. Haskell's ranges are pretty
+smart, they enable you to to write both finite and infinite lists, even allowing
+for an optional step. Here they are in action:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#f29668;">..</span><span style="color:#f29718;">5</span><span>]
+</span><span>[</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">5</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4 </span><span style="color:#f29668;">.. </span><span style="color:#f29718;">10</span><span>]
+</span><span>[</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">8</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">10</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6 </span><span style="color:#f29668;">.. </span><span style="color:#f29718;">10</span><span>]
+</span><span>[</span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">9</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#f29668;">..</span><span>]
+</span><span>[</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">5</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">7</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">8</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">9</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">10</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">11</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29668;">..
+</span></code></pre>
+<p>If ranges aren't enough, how about their &quot;on steroid&quot; counterpart, <strong>list
+comprehension</strong>. Here's how you can use list comprehension to get a list of
+tuples representing the position of every white cell in a chess board:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [(x</span><span style="color:#bfbab0cc;">,</span><span> y) </span><span style="color:#f29668;">|</span><span> x </span><span style="color:#f29668;">&lt;-</span><span> [</span><span style="color:#c2d94c;">&#39;a&#39;</span><span style="color:#f29668;">..</span><span style="color:#c2d94c;">&#39;h&#39;</span><span>]</span><span style="color:#bfbab0cc;">,</span><span> y </span><span style="color:#f29668;">&lt;-</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#f29668;">..</span><span style="color:#f29718;">8</span><span>]</span><span style="color:#bfbab0cc;">,</span><span> odd ((ord x </span><span style="color:#f29668;">-</span><span> ord </span><span style="color:#c2d94c;">&#39;a&#39;</span><span>) </span><span style="color:#f29668;">+</span><span> y </span><span style="color:#f29668;">+ </span><span style="color:#f29718;">1</span><span>)]
+</span><span>[(</span><span style="color:#c2d94c;">&#39;a&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">2</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;a&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">4</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;a&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">6</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;a&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">8</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;b&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">1</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;b&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">3</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;b&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">5</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;b&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">7</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;c&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">2</span><span>)</span><span style="color:#bfbab0cc;">,
+</span><span>(</span><span style="color:#c2d94c;">&#39;c&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">4</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;c&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">6</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;c&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">8</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;d&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">1</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;d&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">3</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;d&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">5</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;d&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">7</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;e&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">2</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;e&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">4</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;e&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">6</span><span>)</span><span style="color:#bfbab0cc;">,
+</span><span>(</span><span style="color:#c2d94c;">&#39;e&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">8</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;f&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">1</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;f&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">3</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;f&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">5</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;f&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">7</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;g&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">2</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;g&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">4</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;g&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">6</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;g&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">8</span><span>)</span><span style="color:#bfbab0cc;">,
+</span><span>(</span><span style="color:#c2d94c;">&#39;h&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">1</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;h&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">3</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;h&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">5</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>(</span><span style="color:#c2d94c;">&#39;h&#39;</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">7</span><span>)]
+</span></code></pre>
+<p>Cool stuff!</p>
+<p>To conclude this section on lists, we ought to talk about all those higher-order
+functions that operate on lists, such as <code>map</code>, <code>filter</code> and <code>fold</code>s. These
+functions are nowadays commonplace in almost all programming languages, therefore
+I won't discuss them in details. In fact, <code>map</code> and <code>filter</code> behave analogously
+to their Javascript, Rust, or Python counterpart. Slightly more interesting is
+<code>fold</code>, which in Haskell is not just a single function but rather a family of
+functions. Indeed we have <code>foldl</code>, <code>foldl'</code>, <code>foldl1</code>, <code>foldr</code>, <code>foldr'</code>, and
+<code>foldr1</code>. That's a lot of folds! Unsurpisingly, the <code>foldl</code> family
+folds the list from the left, while the <code>foldr</code> family does so from the right.
+<code>fold*1</code> doesn't take a starting value for the accumulator and <code>fold*'</code> forces
+strict evaluation forsaking lazyness. <code>fold</code>s are the most powerful
+higher-order functions on lists, in fact every other function can be defined in
+term of folds. Let's see an example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">myMap </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt;</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [b]
+</span><span>myMap f </span><span style="color:#f29668;">=</span><span> foldr (</span><span style="color:#ffb454;">(:) </span><span style="color:#f29668;">.</span><span> f) </span><span style="color:#f29718;">[]
+</span><span>
+</span><span style="color:#ffb454;">myFilter </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; Bool</span><span>) </span><span style="color:#ff7733;">-&gt;</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [a]
+</span><span>myFilter f </span><span style="color:#f29668;">=</span><span> foldr (</span><span style="color:#f29668;">\</span><span>x acc </span><span style="color:#f29668;">-&gt; </span><span style="color:#ff7733;">if</span><span> f x </span><span style="color:#ff7733;">then</span><span> x </span><span style="color:#f29668;">:</span><span> acc </span><span style="color:#ff7733;">else</span><span> acc) </span><span style="color:#f29718;">[]
+</span><span>
+</span><span style="color:#ffb454;">myReverse </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [a]
+</span><span>myReverse </span><span style="color:#f29668;">=</span><span> foldl (flip </span><span style="color:#ffb454;">(:)</span><span>) </span><span style="color:#f29718;">[]
+</span></code></pre>
+<p>Lastly we have the <code>scan</code> family of functions, which is foreign to both
+Javascript and Python. They work similarly to <code>fold</code> but
+return all the intermediate accumulator states in the form of a list. For
+instance, let's solve this simple problem:</p>
+<blockquote>
+<p>We have a balanced string of parenthesis (only '(' or ')') and we want to check how
+deeply they nest. As an example: &quot;((()()))&quot; has 3 nesting levels, and
+&quot;(()((())))&quot; has 4.</p>
+</blockquote>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">maxDepth </span><span style="color:#ff7733;">:: String -&gt; Bool
+</span><span>maxDepth </span><span style="color:#f29668;">=</span><span> maximum
+</span><span>  </span><span style="color:#f29668;">.</span><span> scanl </span><span style="color:#ffb454;">(+) </span><span style="color:#f29718;">0
+</span><span>  </span><span style="color:#f29668;">.</span><span> map (</span><span style="color:#f29668;">\</span><span>p </span><span style="color:#f29668;">-&gt; </span><span style="color:#ff7733;">if</span><span> p </span><span style="color:#f29668;">== </span><span style="color:#c2d94c;">&#39;(&#39; </span><span style="color:#ff7733;">then </span><span style="color:#f29718;">1 </span><span style="color:#ff7733;">else </span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span>)
+</span></code></pre>
+<p>If we test it with ghci:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> maxDepth </span><span style="color:#c2d94c;">&quot;((()()))&quot;
+</span><span style="color:#f29718;">3
+</span></code></pre>
+<h2 id="the-maybe-type">The Maybe type</h2>
+<p>An astute reader may have realized that some of the functions' definitions
+previously given out can fail in certain circumstances. Let's have a look at
+<code>head</code> again:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">head </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt; </span><span>a
+</span><span>head (x</span><span style="color:#f29668;">:</span><span>_) </span><span style="color:#f29668;">=</span><span> x
+</span></code></pre>
+<p><code>head</code> uses pattern matching to extract the first element of a list and returns
+it, but what happens when the list has no elements? Does <code>head</code> return <code>null</code>?
+But wait, you said that Haskell doesn't have <code>null</code>! Let's give it a try:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> head </span><span style="color:#f29718;">[]
+</span><span>*** </span><span style="color:#f29718;">Exception</span><span style="color:#f29668;">: </span><span style="color:#f29718;">Prelude</span><span style="color:#f29668;">.</span><span>head</span><span style="color:#f29668;">:</span><span> empty list
+</span></code></pre>
+<p>Huh, it returns an error.. I mean, <code>null</code> would have been better than error,
+wouldn't it? How does Haskell handle these cases?</p>
+<p>As we previously said, Haskell doesn't have <code>null</code>, but guess what? It has
+something way better: the <code>Maybe</code> type, which is defined like so:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">data </span><span style="color:#f29718;">Maybe</span><span> a </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Just</span><span> a </span><span style="color:#f29668;">| </span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>The <code>Maybe</code> type is a type with two variants, <code>Just a</code> when a value is present,
+or <code>Nothing</code> when it's missing. Simple right? Let's give it a spin and implement
+a <code>safeHead</code> function:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">safeHead </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt; Maybe </span><span>a
+</span><span>safeHead </span><span style="color:#f29718;">[] </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Nothing
+</span><span>safeHead (x</span><span style="color:#f29668;">:</span><span>_) </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Just</span><span> x
+</span><span>
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> safeHead </span><span style="color:#f29718;">[]
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> safeHead [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span style="color:#f29718;">Just 1
+</span></code></pre>
+<p>One would argue that this is no different than using <code>null</code>, with the only
+advantage, albeit compelling, of the explicit possible absence of such a value 
+in the function's signature. Rust does the same thing with the <code>Option&lt;T&gt;</code> type,
+so do both Kotlin and Typescript with <code>T?</code>. So, what's the advantage here? Let's
+go through an example: suppose we have a list of numbers and we want to find the
+first value that is a multiple of <code>7</code>, when we find it we want to add <code>3</code> to it
+and return the result. In Typescript it would look similar to this:</p>
+<pre data-lang="typescript" style="background-color:#0f1419;color:#bfbab0;" class="language-typescript "><code class="language-typescript" data-lang="typescript"><span style="color:#ff7733;">const </span><span style="color:#ffb454;">f </span><span style="color:#f29668;">= </span><span>(</span><span style="color:#f29718;">xs</span><span style="color:#f29668;">: </span><span style="font-style:italic;color:#39bae6;">number</span><span>[])</span><span style="color:#f29668;">: </span><span style="font-style:italic;color:#39bae6;">number</span><span style="color:#f29668;">? </span><span style="color:#ff7733;">=&gt; </span><span>{
+</span><span>  </span><span style="color:#ff7733;">const </span><span>x </span><span style="color:#f29668;">= </span><span>xs</span><span style="color:#f29668;">.</span><span style="color:#f07178;">find</span><span>(</span><span style="color:#f29718;">n </span><span style="color:#ff7733;">=&gt; </span><span>n </span><span style="color:#f29668;">% </span><span style="color:#f29718;">7 </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0</span><span>)</span><span style="color:#bfbab0cc;">;
+</span><span>  </span><span style="color:#ff7733;">return </span><span>x </span><span style="color:#f29668;">? </span><span>x </span><span style="color:#f29668;">+ </span><span style="color:#f29718;">3 </span><span style="color:#f29668;">: </span><span style="color:#f29718;">undefined</span><span style="color:#bfbab0cc;">;
+</span><span>}
+</span></code></pre>
+<p>Grr, that's gnarly. And we only had two operations to combine; imagine how the
+code would look with many nested operations on a possibly undefined result!</p>
+<p>Haskell, now is your turn too shine:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">f </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Int</span><span>] </span><span style="color:#ff7733;">-&gt; Maybe Int
+</span><span>f </span><span style="color:#f29668;">=</span><span> fmap (</span><span style="color:#f29668;">+</span><span style="color:#f29718;">3</span><span>) </span><span style="color:#f29668;">.</span><span> find (</span><span style="color:#f29668;">\</span><span>x </span><span style="color:#f29668;">-&gt;</span><span> x </span><span style="color:#f29668;">`mod` </span><span style="color:#f29718;">7 </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0</span><span>)
+</span></code></pre>
+<p>Nice! So, Haskell gives us a well defined way to &quot;map&quot; a possible undefined
+value through <code>fmap</code>. Its definition looks similar to this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">fmap </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt; Maybe </span><span>a </span><span style="color:#ff7733;">-&gt; Maybe </span><span>b
+</span><span>fmap f (</span><span style="color:#f29718;">Just</span><span> x) </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Just</span><span> (f x)
+</span><span>fmap _ </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>If we apply <code>f</code> to a <code>Nothing</code> we get a <code>Nothing</code> back, otherwise, if we apply
+<code>f</code> to a <code>Just x</code> we get a <code>Just (f x)</code>. In other words, <code>fmap</code> can &quot;look
+inside&quot; the <code>Maybe</code> value and apply <code>f</code> only if something is &quot;inside&quot; it.</p>
+<p>If you thing this is cool, get ready, because this is just the tip of the
+iceberg! As we'll see in the next section, <code>Maybe</code> values are not the only thing
+that can be <code>fmap</code>-ed over.</p>
+<h1 id="functors-applicatives-and-monads">Functors, Applicatives, and Monads</h1>
+<p>I'm a lier. Kinda.</p>
+<p>If you try checking the type definition of <code>fmap</code> you'll see that is not the one
+I gave you in the previous section. In fact:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t fmap
+</span><span style="color:#ffb454;">fmap </span><span style="color:#ff7733;">:: Functor </span><span>f </span><span style="color:#ff7733;">=&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt; </span><span>f a </span><span style="color:#ff7733;">-&gt; </span><span>f b
+</span></code></pre>
+<p>What's a <strong>Functor</strong>? It sounds cool!</p>
+<h2 id="functors">Functors</h2>
+<p>Since we have already seen that syntax, we can say with a certain degree of
+certainty that <code>Functor</code> is a type-class. That's indeed right! Functor is a
+type-class, specifically it's a type-class for types that can be &quot;mapped&quot; over.
+It's definition looks like this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">class </span><span style="font-style:italic;color:#39bae6;">Functor </span><span>f </span><span style="color:#ff7733;">where
+</span><span>  </span><span style="color:#ffb454;">fmap </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt; </span><span>f a </span><span style="color:#ff7733;">-&gt; </span><span>f b </span><span style="font-style:italic;color:#5c6773;">-- same as the infix operator (&lt;$&gt;)
+</span></code></pre>
+<p>We have already seen how <code>Maybe</code> is an instance of <code>Functor</code>, but are there any
+other instances? Well, lists can be mapped over, right? In fact, lists are
+indeed functors themselves:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">instance Functor</span><span> [] </span><span style="color:#ff7733;">where
+</span><span>  fmap </span><span style="color:#f29668;">=</span><span> map
+</span></code></pre>
+<p>with <code>fmap</code> corresponding to <code>map</code>. Another instance of <code>Functor</code> that is not as
+obvious as <code>[a]</code>, is the function type <code>((-&gt;) r)</code>. Wtf?! How do you map over a
+function?! Let's try replacing <code>f</code> with <code>r -&gt;</code> in <code>fmap</code>'s type definition:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">instance Functor</span><span> ((</span><span style="color:#ff7733;">-&gt;</span><span>) r) </span><span style="color:#ff7733;">where
+</span><span style="color:#ffb454;">fmap </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt;</span><span> (r </span><span style="color:#ff7733;">-&gt; </span><span>a) </span><span style="color:#ff7733;">-&gt;</span><span> (r </span><span style="color:#ff7733;">-&gt; </span><span>b)
+</span></code></pre>
+<p>Uhhm.. So, for functions <code>fmap</code> takes a function <code>a -&gt; b</code>, a function <code>r -&gt; a</code>
+and returns a function <code>r -&gt; b</code>. Strange, this feels familiar, doesn't it? Wait!
+That's just the same as function composition <code>(.)</code>! If we put the two
+definitions together and we use the same type parameters this is what we get:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">(.) </span><span style="color:#ff7733;">::</span><span> (b </span><span style="color:#ff7733;">-&gt; </span><span>c) </span><span style="color:#ff7733;">-&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>c)
+</span><span style="font-style:italic;color:#5c6773;">-- changing type parameters
+</span><span style="color:#ffb454;">(.) </span><span style="color:#ff7733;">::</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b) </span><span style="color:#ff7733;">-&gt;</span><span> (r </span><span style="color:#ff7733;">-&gt; </span><span>a) </span><span style="color:#ff7733;">-&gt;</span><span> (r </span><span style="color:#ff7733;">-&gt; </span><span>b)
+</span></code></pre>
+<p>That's indeed the same type! Moreover, it kinda makes sense right? If we open up
+a function the thing we find inside it is its return value. If we want to map over
+a funtion then, we take the return value of the function and apply another
+function to it. If we write it as an expression:</p>
+<ul>
+<li>we open up the function: <code>f (x)</code></li>
+<li>and we apply another function to what's inside it: <code>f (g x)</code>
+This definetely smells like function composition! And that's indeed the case:</li>
+</ul>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">instance Functor</span><span> ((</span><span style="color:#ff7733;">-&gt;</span><span>) r) </span><span style="color:#ff7733;">where
+</span><span>  fmap </span><span style="color:#f29668;">= </span><span style="color:#ffb454;">(.)
+</span></code></pre>
+<p>Knowing that functions are functors too is not that helpful, but we now have a
+better grasp on what makes a type a functor. Plus our brain got way more
+wrinkly!</p>
+<p>We have seen that Functors are things that can be mapped over, allowing to
+change their content through <code>fmap</code>. In one's mind, this concept would very well
+be modeled using a &quot;box&quot; analogy: we have a box, our functor, and by applying a
+function to it we change its content, but not the box itself. This works great
+in most cases, expecially to grasp the essence of functors at first, but it
+might fall short in some more complex instances. This said, let's try a new
+mental model to help us reason not only about functors, but about applicatives
+and monads too. So, functors aren't boxes but <strong>computational contexts</strong> or
+<strong>effects</strong>. Here's a couple examples:</p>
+<ul>
+<li>The <code>Maybe</code> type <em>carries the effect</em> of possible failure.</li>
+<li>The list type <code>[]</code> carries the effect of choice, in fact its content can be
+nothing, one value, many values or even infinite ones. Lists represents
+<em>non-determinism</em>.</li>
+</ul>
+<h2 id="applicative-functors">Applicative Functors</h2>
+<p>Now with functors under our belt, we can level up our Haskell skill by getting
+acquainted with <strong>applicative functors</strong>, or just applicatives for short.</p>
+<p>If functors allow us to map an effectful value, applicatives give us the
+superpower of threading a value into a minimal effectful context and the ability
+to sequence computations on such contexts. Let's jump to <code>Applicative</code>'s class
+definition:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">class </span><span style="font-style:italic;color:#39bae6;">Functor </span><span>f =&gt; </span><span style="font-style:italic;color:#39bae6;">Applicative </span><span>f </span><span style="color:#ff7733;">where
+</span><span>  </span><span style="color:#ffb454;">pure </span><span style="color:#ff7733;">:: </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>f a
+</span><span>  </span><span style="color:#ffb454;">(&lt;*&gt;) </span><span style="color:#f29668;">::</span><span> f (a </span><span style="color:#f29668;">-&gt;</span><span> b) </span><span style="color:#f29668;">-&gt;</span><span> f a </span><span style="color:#f29668;">-&gt;</span><span> f b
+</span></code></pre>
+<p>Soooo, what do we have here.. <code>Functor f =&gt; Applicative f</code> tells us that an
+instance of <code>Applicative</code> must be a <code>Functor</code> first; got that. <code>pure</code> puts a
+value into the applicative context, that's easy peasy. And finally, <code>&lt;*&gt;</code>
+applies a function wrapped in an applicative context to a value wrapped in the
+same context. Mmm, sounds tricky. Let's try to contextualize it by taking a look
+at the <code>Maybe</code> instance of <code>Applicative</code>:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">instance Applicative Maybe where
+</span><span>  pure </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Just
+</span><span>
+</span><span>  </span><span style="color:#f29718;">Just</span><span> f </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> m </span><span style="color:#f29668;">=</span><span> fmap f m
+</span><span>  </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> _ </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>Ok, so now we can apply a function that is possibly not there to a value that is
+itself possibly not there.. This doesn't sounds too exciting.</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just</span><span> signum </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 3
+</span><span style="color:#f29718;">Just 1
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just</span><span> signum </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just</span><span> (</span><span style="color:#f29668;">-</span><span style="color:#f29718;">2</span><span>)
+</span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>I mean, sure, very cool stuff, but I gotta say I'm not that impressed. Maybe it
+has its use cases, but I don't see myself returning a <code>Maybe</code> function any time
+soon. But wait! What if we use it to apply a function to two possibly undefined
+values? That sounds more reasonable! To achieve this we can partially apply the
+function to the first <code>Maybe</code> argument and then use <code>&lt;*&gt;</code> to get the final
+value! For instance, let's say we want to return the sum of the first even number
+and the first odd number in a list. That would look something like this:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">sumFirstEvenAndOdd </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Int</span><span>] </span><span style="color:#ff7733;">-&gt; Maybe Int
+</span><span>sumFirstEvenAndOdd xs </span><span style="color:#f29668;">= </span><span style="color:#ffb454;">(+) </span><span style="color:#f29668;">&lt;$&gt;</span><span> firstOdd </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> firstEven
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    firstOdd </span><span style="color:#f29668;">=</span><span> find odd xs
+</span><span>    firstEven </span><span style="color:#f29668;">=</span><span> find even xs
+</span></code></pre>
+<p>It makes sense. <code>(+) &lt;$&gt; firstOdd</code> gives us back either a <code>Just (n+)</code> or
+<code>Nothing</code>, thus if we apply this to a <code>Just m</code> the operation completes with a
+<code>Just (n+m)</code>. Cool! This doesn't just works with functions of two arguments but
+can be used for any number of arguments. Since the pattern <code>f &lt;$&gt; x &lt;*&gt; y</code> is
+used pretty often, Haskell provides us with the function <code>liftA2</code> which does the
+same thing:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">liftA2 </span><span style="color:#ff7733;">:: Applicative </span><span>f </span><span style="color:#ff7733;">=&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>b </span><span style="color:#ff7733;">-&gt; </span><span>c) </span><span style="color:#ff7733;">-&gt; </span><span>f a </span><span style="color:#ff7733;">-&gt; </span><span>f b </span><span style="color:#ff7733;">-&gt; </span><span>f c
+</span><span>liftA2 f x y </span><span style="color:#f29668;">=</span><span> f </span><span style="color:#f29668;">&lt;$&gt;</span><span> x </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> y
+</span></code></pre>
+<p>We also have <code>liftA3</code>, <code>liftA4</code>, and so on for functions of more than two
+arguments.</p>
+<p>What about lists though? Lists are functors, are they applicatives too? They
+surely are! Let's give it a try:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> pure </span><span style="color:#f29718;">1 </span><span style="color:#f29668;">::</span><span> [</span><span style="color:#f29718;">Int</span><span>]
+</span><span>[</span><span style="color:#f29718;">1</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [(</span><span style="color:#f29718;">1</span><span style="color:#f29668;">+</span><span>)] </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span>[</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span>]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [(</span><span style="color:#f29718;">1</span><span style="color:#f29668;">+</span><span>)] </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">[]
+</span><span style="color:#f29718;">[]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [(</span><span style="color:#f29718;">1</span><span style="color:#f29668;">+</span><span>)</span><span style="color:#bfbab0cc;">,</span><span>signum</span><span style="color:#bfbab0cc;">,</span><span>(*</span><span style="color:#f29718;">3</span><span>)] </span><span style="color:#f29668;">&lt;</span><span>*</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">,</span><span style="color:#f29718;">3</span><span>]
+</span><span>[</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">4</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">6</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">9</span><span>]
+</span></code></pre>
+<p>What's wrong with the last one?! If you were expecting <code>[2,1,9]</code> as the result
+don't worry, I'll explain now. Remember we said that the effect or context of
+lists is <em>choice</em>? Well, choice means that they can't decide on a single result.
+If we can't decide on a value, the only possible course of action is to not decide
+at all. So, when we combine the effects of lists, we simply consider
+all possible outcomes, that is we evaluate every possible combinations of the
+pair <code>(f, x)</code>, hence the resulting list will have the same length as the product
+of the two lists' lengths.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> If your desired behaviour for the <code>&lt;*&gt;</code> operator is to perform its
+computations element-wise, what you are looking for is
+<a href="https://hackage.haskell.org/package/base-4.18.0.0/docs/Control-Applicative.html#t:ZipList">ZipList</a>
+which I won't cover in this article.</p>
+</blockquote>
+<h2 id="monads">Monads</h2>
+<p>The time has finally come. We wrinkled our brain with functors and applicative
+functors and so only one step divides us from reaching the pinnacle of Haskell's
+type trinity: <strong>Monads</strong>.</p>
+<p>Monads are as powerful as they are dreaded. Even Scratch and Javascript
+programmers fear them. Asking what a monad is, is taboo; the only sensible
+response is &quot;a monad is a monoid in the category of endofunctors, what's the
+problem?&quot;.
+Monads are truly incredible! But we are ready to tackle them.
+Sorta. Kinda. Well, we really don't have to fully comprehend them, what we
+actually need is to get to know them well enough to be able to harness them into
+writing some sick af Haskell code. Let's go!</p>
+<p>Diving right into the class definition we see:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">class </span><span style="font-style:italic;color:#39bae6;">Applicative </span><span>m =&gt; </span><span style="font-style:italic;color:#39bae6;">Monad </span><span>m </span><span style="color:#ff7733;">where
+</span><span>  </span><span style="color:#ffb454;">(&gt;&gt;=) </span><span style="color:#ff7733;">:: </span><span>m a </span><span style="color:#ff7733;">-&gt;</span><span> (a </span><span style="color:#ff7733;">-&gt; </span><span>m b) </span><span style="color:#ff7733;">-&gt; </span><span>m b
+</span><span>  </span><span style="color:#ffb454;">(&gt;&gt;) </span><span style="color:#ff7733;">:: </span><span>m a </span><span style="color:#ff7733;">-&gt; </span><span>m b </span><span style="color:#ff7733;">-&gt; </span><span>m b
+</span><span>  </span><span style="color:#ffb454;">return </span><span style="color:#ff7733;">:: </span><span>a </span><span style="color:#ff7733;">-&gt; </span><span>m a
+</span></code></pre>
+<p>Starting off with the easiest one, <code>return</code>, it kinda reminds of <code>pure</code>, doesn't
+it? Well it's basically the same thing, it takes a value and wraps it into a
+minimal effectful context, which this time has to be an instance of both Monad
+and Applicative. Two more to go. The <code>&gt;&gt;=</code> operator, also called
+&quot;bind&quot;, is used to sequence effectful computations, threading the result of the
+first into the second as its argument. To understand what <code>&gt;&gt;=</code> does, let's jump
+into an example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> safeDiv3 x </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">if</span><span> x </span><span style="color:#f29668;">`mod` </span><span style="color:#f29718;">3 </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0 </span><span style="color:#ff7733;">then </span><span style="color:#f29718;">Just</span><span> (x </span><span style="color:#f29668;">`div` </span><span style="color:#f29718;">3</span><span>) </span><span style="color:#ff7733;">else </span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> safeDiv3 </span><span style="color:#f29718;">21
+</span><span style="color:#f29718;">Just 7
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> safeDiv3 </span><span style="color:#f29718;">5
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 21 </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3
+</span><span style="color:#f29718;">Just 7
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 5 </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 9 </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3 </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3
+</span><span style="color:#f29718;">Just 1
+</span></code></pre>
+<p>Ok, unsurprisingly <code>Maybe</code> is a monad, that was to be expected. So, <code>&gt;&gt;=</code> allows
+us to chain monadic computations in a simple way. Without it, we would have to
+pattern match on the result of each application and decide if we can keep on
+going. That's indeed handy.</p>
+<p>The last function the <code>Monad</code> type class provides us is <code>(&gt;&gt;)</code>, somethimes
+called &quot;then&quot;. The <code>&gt;&gt;</code>
+operator is quite simple, it takes two monadic values and combines their
+effects, discarding any value from the first one:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 3 </span><span style="color:#f29668;">&gt;&gt; </span><span style="color:#f29718;">Just </span><span style="color:#c2d94c;">&quot;hello&quot;
+</span><span style="color:#c2d94c;">&quot;hello&quot;
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 3 </span><span style="color:#f29668;">&gt;&gt; </span><span style="color:#f29718;">Nothing
+</span><span style="color:#f29718;">Nothing
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&gt;&gt; </span><span style="color:#f29718;">Just </span><span style="color:#c2d94c;">&quot;hello&quot;
+</span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>I want to stress on the fact that <code>&gt;&gt;</code> doesn't simply returns the right monad.
+It first combines the two effects, then the right pure value is returned inside
+the resulting effect. This is probably hard to understand as <code>Maybe</code> is quite
+the simple monad. How about lists then? We have seen how lists are functors, and
+applicative functors, so lists being monads shouldn't come as a surpise</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>] </span><span style="color:#f29668;">&gt;&gt;</span><span> [</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span>]
+</span><span>[</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span>]
+</span></code></pre>
+<p>We can now see a bit better how the effects gets combined. The non-determinism
+of the first list is combined with the second's resulting in a list with more
+choices. Then this resulting list gets filled with the values of only the second
+one.</p>
+<p>Let's have a look at both <code>Maybe</code> and <code>[]</code> instances of <code>Monad</code>:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">instance Monad Maybe where
+</span><span>  (</span><span style="color:#f29718;">Just</span><span> x) </span><span style="color:#f29668;">&gt;&gt;=</span><span> f </span><span style="color:#f29668;">=</span><span> f x
+</span><span>  </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&gt;&gt;=</span><span> _ </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Nothing
+</span><span>
+</span><span style="color:#ff7733;">instance Monad</span><span> [] </span><span style="color:#ff7733;">where
+</span><span>  xs </span><span style="color:#f29668;">&gt;&gt;=</span><span> f </span><span style="color:#f29668;">=</span><span> concat (fmap f xs)
+</span></code></pre>
+<p>The <code>Maybe</code>'s instance is simple enough, but the list's is a bit more tricky.
+What's with the <code>concat</code>? The type signature for <code>&gt;&gt;=</code> on lists is the
+following: <code>(&gt;&gt;=) :: [a] -&gt; (a -&gt; [b]) -&gt; [b]</code> which we obtain simply replacing
+<code>m</code> with <code>[]</code>. So, <code>f</code> is a function that takes a single value and returns a
+list. Thus if we use <code>f</code> to map over list <code>xs</code> we obtain a list of lists:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> (</span><span style="color:#f29668;">\</span><span>x </span><span style="color:#f29668;">-&gt;</span><span> [</span><span style="color:#f29668;">-</span><span>x</span><span style="color:#bfbab0cc;">,</span><span> x]) </span><span style="color:#f29668;">&lt;$&gt;</span><span> [</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]
+</span><span>[[</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span>]</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29668;">-</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span>]</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29668;">-</span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">3</span><span>]]
+</span></code></pre>
+<p><code>&gt;&gt;=</code>'s signature though states that the result should be a list of pure values
+and not a lists of monads. For this reason, we use <code>concat</code> to &quot;flatten&quot; the
+list:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t concat
+</span><span style="color:#ffb454;">concat </span><span style="color:#ff7733;">::</span><span> [[a]] </span><span style="color:#ff7733;">-&gt;</span><span> [a]
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> concat [[</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span>]</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29668;">-</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span>]]
+</span><span>[</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29668;">-</span><span style="color:#f29718;">2</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">2</span><span>]
+</span></code></pre>
+<p>The <code>&gt;&gt;=</code> operator is indeed powerful, but sometimes, expecially when we have to chain
+many different computation, <code>&gt;&gt;=</code> gets a bit tedious to use:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 12 </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3 </span><span style="color:#f29668;">&gt;&gt;=</span><span> (</span><span style="color:#f29668;">\</span><span>x </span><span style="color:#f29668;">-&gt; </span><span style="color:#f29718;">Just </span><span style="color:#c2d94c;">&quot; all good!&quot; </span><span style="color:#f29668;">&gt;&gt;=</span><span> (</span><span style="color:#f29668;">\</span><span>y </span><span style="color:#f29668;">-&gt; </span><span style="color:#f29718;">Just</span><span> (show x </span><span style="color:#f29668;">++</span><span> y)))
+</span><span style="color:#f29718;">Just </span><span style="color:#c2d94c;">&quot;4 all good!&quot;
+</span></code></pre>
+<p>Luckily Haskell provides us with a very convenient way to work with multiple
+effects in sequence: <strong>do notation</strong>. Let's see it in action:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">foo </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Int</span><span>] </span><span style="color:#ff7733;">-&gt; Maybe String
+</span><span>foo xs </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  x </span><span style="color:#f29668;">&lt;-</span><span> find (</span><span style="color:#f29668;">&gt;</span><span style="color:#f29718;">10</span><span>) xs
+</span><span>  y </span><span style="color:#f29668;">&lt;-</span><span> safeDiv3 x
+</span><span>  return (show y </span><span style="color:#f29668;">++ </span><span style="color:#c2d94c;">&quot; cool!&quot;</span><span>)
+</span></code></pre>
+<p>Ok, cool. This kinda resemble imperative code! If we had to write this function
+without using do notation, it would look something like:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>foo xs </span><span style="color:#f29668;">=</span><span> find (</span><span style="color:#f29668;">&gt;</span><span style="color:#f29718;">10</span><span>) xs </span><span style="color:#f29668;">&gt;&gt;=</span><span> safeDiv3 </span><span style="color:#f29668;">&gt;&gt;=</span><span> (</span><span style="color:#f29668;">\</span><span>y </span><span style="color:#f29668;">-&gt; </span><span style="color:#f29718;">Just</span><span> (show y </span><span style="color:#f29668;">++ </span><span style="color:#c2d94c;">&quot; cool!&quot;</span><span>))
+</span></code></pre>
+<p>Which, we gotta say, it's not as readable. In kinda sucks to be honest.</p>
+<h3 id="the-io-monad">The IO monad</h3>
+<p>With our new shiny do notation we can work with monads in quite the simple way.
+Just using <code>Maybe</code> and <code>[]</code> though is quite boring. Let's introduce another
+monad, the one we have been waiting for all along. Guess it's finally time for
+that <code>print &quot;Hello, World!&quot;</code> huh. Let's give it a try:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt;</span><span> print </span><span style="color:#c2d94c;">&quot;Hello, World!&quot;
+</span><span style="color:#c2d94c;">&quot;Hello, World!&quot;
+</span></code></pre>
+<blockquote>
+<p>Woooot?! You said it wasn't that easy! We had to go through all that shit but
+it actually WAS that easy!</p>
+</blockquote>
+<p>Hold down your horses. Check the type signature of <code>print</code>:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; :</span><span>t print
+</span><span style="color:#ffb454;">print </span><span style="color:#ff7733;">:: Show </span><span>a </span><span style="color:#ff7733;">=&gt; </span><span>a </span><span style="color:#ff7733;">-&gt; IO </span><span style="font-style:italic;color:#f29668;">()
+</span></code></pre>
+<p>See, not that simple. Type class <code>Show</code> is for types that can be made into
+strings through the <code>show</code> function we have seen earlier. That <code>IO ()</code> at
+the end is, guess what, a monad, where <code>()</code> is the empty tuple, usually called &quot;unit&quot;
+and is basically the same thing as <code>void</code> in other languages. The <code>IO</code> monad is
+used to carry out operations that requires to interact with the underlying
+operating system. That is, reading and writing to and from a file, or reading
+user input and printing to the terminal. All these operations are indeed
+side-effects, and we have stressed already how Haskell's functions can't perform
+side-effects. That is indeed true, and that's why we have to wrap them in an IO
+monad.</p>
+<p><code>IO</code> is, like all other monads, an effectful computation, which in this
+case perform a side-effect. Although <code>IO</code> carries a side-effect, that doesn't
+mean every function that operates on <code>IO</code> can carry them out. In fact, they
+can't. In Haskell the only function that can perform the effectfull computation
+of an <code>IO</code> monad is the <code>main</code> function, which is the entry point for every
+Haskell program. That's the only exception, plus <code>ghci</code>. All other functions can indeed work
+with <code>IO</code> but its effect will only be carried out once the monadic <code>IO</code> value
+reaches the <code>main</code> function. This means that <code>main</code> isolates <em>impure</em> code from
+pure one, allowing us to still benefit from referential transparency.</p>
+<p>Let's play a bit with <code>IO</code>:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">greetUser </span><span style="color:#ff7733;">:: IO </span><span style="font-style:italic;color:#f29668;">()
+</span><span>greetUser </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span> putStr </span><span style="color:#c2d94c;">&quot;Welcome, what&#39;s your name good Sir?</span><span style="color:#95e6cb;">\n</span><span style="color:#c2d94c;">&gt; &quot;
+</span><span> name </span><span style="color:#f29668;">&lt;-</span><span> getLine
+</span><span> putStrLn (</span><span style="color:#c2d94c;">&quot;A pleasure to meet you, &quot; </span><span style="color:#f29668;">++</span><span> name)
+</span><span>
+</span><span style="color:#ffb454;">haskellIsAmazing </span><span style="color:#ff7733;">:: Int -&gt; String
+</span><span style="color:#ffb454;">haskellIsAmazing </span><span style="color:#ff7733;">:: </span><span>unlines . flip replicate &quot;</span><span style="color:#ff7733;">Haskell </span><span>is amazing!&quot;
+</span><span>
+</span><span>main </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span> greetUser
+</span><span> putStr </span><span style="color:#c2d94c;">&quot;How many times would you like me to say that haskell is amazing?</span><span style="color:#95e6cb;">\n</span><span style="color:#c2d94c;">&gt; &quot;
+</span><span> n </span><span style="color:#f29668;">&lt;-</span><span> read </span><span style="color:#f29668;">&lt;$&gt;</span><span> getLine
+</span><span> putStrLn (haskellIsAmazing n)
+</span></code></pre>
+<p>Running this we get:</p>
+<pre style="background-color:#0f1419;color:#bfbab0;"><code><span>Welcome, what&#39;s your name good Sir?
+</span><span>&gt; Bruno
+</span><span>A pleasure to meet you, Bruno
+</span><span>How many times would you like me to say that Haskell is amazing?
+</span><span>&gt; 3
+</span><span>Haskell is amazing!
+</span><span>Haskell is amazing!
+</span><span>Haskell is amazing!
+</span></code></pre>
+<p>Well well well, what do we have here? We finally managed to write a program a 6
+year old could write in two minutes with Python! But we did it in Haskell, that
+makes us like super cool. In your face kiddo!</p>
+<p>Anyway, we now know how to tap into the <em>inpure</em>, making our program capable of
+interacting with the outside world. We can use <code>putStr</code> and <code>putStrLn</code> to write
+a string to <code>stdout</code> and <code>getLine</code> to grab a string from <code>stdin</code>.</p>
+<p><code>read</code> is the opposite of <code>show</code>, it enables us to parse a value out of a
+string. It's a function provided by the <code>Read</code> type class and is implemented for
+the most commonplace Haskell's types.</p>
+<h3 id="the-state-monad">The State monad</h3>
+<p>In imperative languages, keeping track of some state is as easy as pie. You just use variables,
+changing their values as your program runs. For instance, suppose we have to
+count the occurrences of even numbers in a list. In Javascript you could write
+something like:</p>
+<pre data-lang="javascript" style="background-color:#0f1419;color:#bfbab0;" class="language-javascript "><code class="language-javascript" data-lang="javascript"><span style="color:#ff7733;">function </span><span style="color:#ffb454;">countEvenInList</span><span>(</span><span style="color:#f29718;">list</span><span>) {
+</span><span>  </span><span style="color:#ff7733;">let </span><span>count </span><span style="color:#f29668;">= </span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">;
+</span><span>  </span><span style="color:#ff7733;">for </span><span>(n </span><span style="color:#f29668;">in </span><span>list) {
+</span><span>    </span><span style="color:#ff7733;">if </span><span>(n </span><span style="color:#f29668;">% </span><span style="color:#f29718;">2  </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0</span><span>) count</span><span style="color:#f29668;">++
+</span><span>  }
+</span><span>}
+</span></code></pre>
+<p>Besides the fact that it's not 2008 anymore and that we could easily rewrite this
+piece of garbage as</p>
+<pre data-lang="javascript" style="background-color:#0f1419;color:#bfbab0;" class="language-javascript "><code class="language-javascript" data-lang="javascript"><span style="color:#ff7733;">const </span><span style="color:#ffb454;">countEvenInList </span><span style="color:#f29668;">= </span><span style="color:#f29718;">list </span><span style="color:#ff7733;">=&gt; </span><span>list</span><span style="color:#f29668;">.</span><span style="color:#ffb454;">filter</span><span>(</span><span style="color:#f29718;">n </span><span style="color:#ff7733;">=&gt; </span><span>n </span><span style="color:#f29668;">% </span><span style="color:#f29718;">2 </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0</span><span>)</span><span style="color:#f29668;">.</span><span>length
+</span></code></pre>
+<p>performing operations while keeping track of some kind of state is indeed
+helpful.</p>
+<p>We have seen how monads give us the ability to work around side-effects. So, can
+they help us achieve stateful computations too, without forsaking pureness?
+As always the answer is yes! What we need is a brand new monad, the <strong>state
+monad</strong>. Let's try it first just to get the hang of it, then we can try to
+unveil its inner workings.</p>
+<p>Let's use again the parenthesis expression exercise. Our task is the same but
+now we won't suppose the expression is balanced. We'll have to check that
+ourselves.
+Furthermore our input now won't only be comprised of parenthesis, but it will
+be a full math expression, with numbers and operators. It will look something
+like this <code>&quot;(1 + (2 - 3) * 2 - (1 - (3 + 4)))&quot;</code>. Let's do some cleanup first.
+We just care about the parenthesis:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">cleanExpr </span><span style="color:#ff7733;">:: String -&gt; String
+</span><span>cleanExpr </span><span style="color:#f29668;">=</span><span> filter (</span><span style="color:#f29668;">`elem`</span><span> [</span><span style="color:#c2d94c;">&#39;(&#39;</span><span style="color:#bfbab0cc;">, </span><span style="color:#c2d94c;">&#39;)&#39;</span><span>])
+</span><span>
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> cleanExpr </span><span style="color:#c2d94c;">&quot;(1 + (2 - 3) * 2 - (1 - (3 + 4)))&quot;
+</span><span>(</span><span style="color:#f29718;">()</span><span>(</span><span style="color:#f29718;">()</span><span>))
+</span></code></pre>
+<p>Easy. In an imperative language we could go through each element of the list
+while keeping track of a stack of parenthesis. Every time we encounter <code>(</code> we
+push it to the top of the stack.
+When we encounter <code>)</code> instead, we pop the top
+of the stack. When we are done traversing the entire list we check the
+stack: if it's empty then the expression is balanced.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> since the input has only one type of parenthesis, we could simply
+use a counter instead of going for a stack.</p>
+<p><strong><em>Exercise for the reader:</em></strong> try solving this same exercise but with inputs
+that use all kind of parenthesis: <code>&quot;{[()]}&quot;</code>. The input is not guaranteed to
+have balanced parenthesis. You'll have to validate that for yourself. Don't
+forget that parenthesis have different priorities!</p>
+</blockquote>
+<p>In Haskell we can do the
+same thing, even without the <code>State</code> monad:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">pop </span><span style="color:#ff7733;">::</span><span> [a] </span><span style="color:#ff7733;">-&gt; Maybe</span><span> ([a], a)
+</span><span>pop </span><span style="color:#f29718;">[] </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Nothing
+</span><span>pop (x</span><span style="color:#f29668;">:</span><span>xs) </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Just</span><span> (xs</span><span style="color:#bfbab0cc;">,</span><span> x)
+</span><span>
+</span><span style="color:#ffb454;">push </span><span style="color:#ff7733;">:: </span><span>a </span><span style="color:#ff7733;">-&gt;</span><span> [a] </span><span style="color:#ff7733;">-&gt;</span><span> [a]
+</span><span>push </span><span style="color:#f29668;">= </span><span style="color:#ffb454;">(:)
+</span><span>
+</span><span style="color:#ffb454;">updateStack </span><span style="color:#ff7733;">:: Char -&gt;</span><span> [</span><span style="color:#ff7733;">Char</span><span>] </span><span style="color:#ff7733;">-&gt; Maybe</span><span> [</span><span style="color:#ff7733;">Char</span><span>]
+</span><span>updateStack p stack </span><span style="color:#f29668;">=
+</span><span>  </span><span style="color:#ff7733;">if</span><span> p </span><span style="color:#f29668;">== </span><span style="color:#c2d94c;">&#39;(&#39; </span><span style="color:#ff7733;">then
+</span><span>    </span><span style="color:#f29718;">Just</span><span> (push p stack)
+</span><span>  </span><span style="color:#ff7733;">else
+</span><span>    fst </span><span style="color:#f29668;">&lt;$&gt;</span><span> pop stack
+</span><span>
+</span><span style="color:#ffb454;">maxDepth </span><span style="color:#ff7733;">:: String -&gt; Maybe Int
+</span><span>maxDepth expr </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  stackSizes </span><span style="color:#f29668;">&lt;-</span><span> traverse (fmap length) 
+</span><span>    </span><span style="color:#f29668;">.</span><span> scanl (</span><span style="color:#f29668;">\</span><span>stack p </span><span style="color:#f29668;">-&gt;</span><span> stack </span><span style="color:#f29668;">&gt;&gt;=</span><span> updateStack p) (</span><span style="color:#f29718;">Just []</span><span>)
+</span><span>    </span><span style="color:#f29668;">$</span><span> cleanExpr expr
+</span><span>  </span><span style="color:#ff7733;">let</span><span> isBalanced </span><span style="color:#f29668;">=</span><span> last stackSizes </span><span style="color:#f29668;">== </span><span style="color:#f29718;">0
+</span><span>  </span><span style="color:#ff7733;">if</span><span> isBalanced </span><span style="color:#ff7733;">then
+</span><span>    return </span><span style="color:#f29668;">$</span><span> maximum stackSizes
+</span><span>  </span><span style="color:#ff7733;">else 
+</span><span>    </span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>Hopefully you should be able to understand most of this code. Let's go
+through it just in case. We clean our input, retaining only the parenthesis, with
+<code>cleanExpr expr</code>. The <code>$</code> operator is just the same as function application but
+with maximum precedence. It's basically the same as wrapping whatever is after
+it in parenthesis. The resulting expression is scanned over, applying <code>updateStack</code>
+at each step. <code>updateStack</code> takes the current parenthesis and the current state
+of the stack and either push to it or pops it. Since <code>pop</code> might fail we have to
+use <code>Maybe</code> where's necessary.</p>
+<p>When <code>scanl</code> has done, we are left with a list
+containing every stack state we went through. We use <code>traverse</code> to convert
+<code>[Maybe [Char]]</code> into a <code>Maybe [Int]</code>, by applying <code>length</code> to each
+element. Nice, we now have <code>stackSizes</code>, a list containing the lengths of all the
+stacks' states we have encountered. In order to check whether the input
+expression is balanced we make sure the last stack is empty. If that's the case,
+we return the maximum value of the list of stack sizes. That's our result.</p>
+<p>Not too shabby I would say! But we can do better, let's try to make some use of
+the <code>State</code> monad to further increase the readability of our code.</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">maxDepth </span><span style="color:#ff7733;">:: String -&gt; Maybe Int
+</span><span>maxDepth expr </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  </span><span style="color:#ff7733;">let</span><span> (stack</span><span style="color:#bfbab0cc;">,</span><span> depth) </span><span style="color:#f29668;">=
+</span><span>        flip runState </span><span style="color:#f29718;">0
+</span><span>          </span><span style="color:#f29668;">.</span><span> foldM step (</span><span style="color:#f29718;">Just []</span><span>)
+</span><span>          </span><span style="color:#f29668;">$</span><span> cleanExpr expr
+</span><span>  isBalanced </span><span style="color:#f29668;">&lt;-</span><span> null </span><span style="color:#f29668;">&lt;$&gt;</span><span> stack
+</span><span>  </span><span style="color:#ff7733;">if</span><span> isBalanced
+</span><span>    </span><span style="color:#ff7733;">then </span><span style="color:#f29718;">Just</span><span> depth
+</span><span>    </span><span style="color:#ff7733;">else </span><span style="color:#f29718;">Nothing
+</span><span>
+</span><span style="color:#ffb454;">step </span><span style="color:#ff7733;">:: Maybe</span><span> [</span><span style="color:#ff7733;">Char</span><span>] </span><span style="color:#ff7733;">-&gt; Char -&gt; State Int</span><span> (</span><span style="color:#ff7733;">Maybe</span><span> [</span><span style="color:#ff7733;">Char</span><span>])
+</span><span>step stack p </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  </span><span style="color:#ff7733;">let</span><span> newStack </span><span style="color:#f29668;">=</span><span> stack </span><span style="color:#f29668;">&gt;&gt;=</span><span> updateStack p
+</span><span>  </span><span style="color:#ff7733;">let</span><span> currDepth </span><span style="color:#f29668;">=</span><span> maybe </span><span style="color:#f29718;">0</span><span> length newStack
+</span><span>  modify (max currDepth)
+</span><span>  return newStack
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    updateStack p stack </span><span style="color:#f29668;">=
+</span><span>      </span><span style="color:#ff7733;">if</span><span> p </span><span style="color:#f29668;">== </span><span style="color:#c2d94c;">&#39;(&#39;
+</span><span>        </span><span style="color:#ff7733;">then </span><span style="color:#f29718;">Just</span><span> (push p stack)
+</span><span>        </span><span style="color:#ff7733;">else</span><span> fst </span><span style="color:#f29668;">&lt;$&gt;</span><span> pop stack
+</span></code></pre>
+<p>Let's go through this. As we did with the other solution, we first cleanup the
+expression. Then, this time, we fold over it instead of scanning. We can see
+that the folding function used is <code>foldM</code>, which is basically the same as
+<code>foldl</code> but with a monadic accumulator, in this case <code>State Int (Maybe [Char])</code>.
+In the <code>step</code> function we compute the new stack and the current depth, which we
+use to update our state with the <code>modify</code> function. <code>modify</code> computes the new
+state value by applying to the current state value the function it receives as
+argument. In this case, we
+pass to <code>modify</code> the partially applied <code>max</code> function, which will set the state
+to <code>max(currDepth, state)</code>. The result of <code>foldM</code> is passed to <code>runState</code> which
+splits the result of our computation from the state itself.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> I know the solution for this exercise might feel a bit
+contrived. If it wasn't for the sake of showcasing the <code>State</code> monad, I would
+have first parsed the solution, making sure the input is valid. Only then,
+I would calculate the max depth of the expression's nesting. The this is,
+<code>State</code> shines in cases where you need to compute something while keeping
+track of something else. This is why I had to validate and
+compute the solution &quot;at the same time&quot;.</p>
+</blockquote>
+<p>Let's have a look at how <code>State</code> is defined.</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">data </span><span style="color:#f29718;">State</span><span> s a </span><span style="color:#f29668;">= </span><span style="color:#f29718;">State</span><span> { runState </span><span style="color:#f29668;">::</span><span> s </span><span style="color:#f29668;">-&gt;</span><span> (a</span><span style="color:#bfbab0cc;">,</span><span> s) }
+</span><span>
+</span><span style="color:#ff7733;">instance Monad</span><span> (</span><span style="color:#ff7733;">State </span><span>s) </span><span style="color:#ff7733;">where
+</span><span>  return x </span><span style="color:#f29668;">= </span><span style="color:#f29718;">State </span><span style="color:#f29668;">$ \</span><span>s </span><span style="color:#f29668;">-&gt;</span><span> (x</span><span style="color:#bfbab0cc;">,</span><span> s)
+</span><span>  (</span><span style="color:#f29718;">State</span><span> h) </span><span style="color:#f29668;">&gt;&gt;=</span><span> f </span><span style="color:#f29668;">= </span><span style="color:#f29718;">State </span><span style="color:#f29668;">$ \</span><span>s </span><span style="color:#f29668;">-&gt; </span><span style="color:#ff7733;">let</span><span> (a</span><span style="color:#bfbab0cc;">,</span><span> newState) </span><span style="color:#f29668;">=</span><span> h s
+</span><span> 				      (</span><span style="color:#f29718;">State</span><span> g) </span><span style="color:#f29668;">=</span><span> f a
+</span><span> 				  </span><span style="color:#ff7733;">in</span><span> g newState
+</span></code></pre>
+<p>We haven't seen this syntax yet, so I'll go through it very breafly now. <code>State</code>
+is defined as a <strong>record</strong> with a single <em>field</em> <code>runState</code>, a function that
+unwraps the stateful computation represented by the <code>State</code> monad into the tuple
+<code>(result, state)</code>. Records allow creating data types with named fields. Those
+fields can be accessed with syntax <code>&lt;field_name&gt; &lt;record value&gt;</code>, since the
+record's fields are just ordinary functions. Or they can be accessed with the
+more familiar syntax <code>&lt;record_value&gt;.&lt;field_name&gt;</code>. Here's an example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">data </span><span style="color:#f29718;">Person</span><span> { name </span><span style="color:#f29668;">:: </span><span style="color:#f29718;">String</span><span style="color:#bfbab0cc;">,</span><span> age </span><span style="color:#f29668;">:: </span><span style="color:#f29718;">Int</span><span> }
+</span><span>
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#ff7733;">let</span><span> bruno </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Person </span><span style="color:#c2d94c;">&quot;bruno&quot; </span><span style="color:#f29718;">33 </span><span style="font-style:italic;color:#5c6773;">-- or Person { name = &quot;bruno&quot;, age = 33 }
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> name bruno
+</span><span style="color:#c2d94c;">&quot;bruno&quot;
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> bruno</span><span style="color:#f29668;">.</span><span>age
+</span><span style="color:#f29718;">33
+</span></code></pre>
+<p>For what concerns the <code>State</code>'s <code>Monad</code> instance, <code>return</code> takes a pure value and
+makes a stateful computation that will return that value. <code>&gt;&gt;=</code> is slightly more
+convoluted. </p>
+<blockquote>
+<p><strong><em>Remember:</em></strong> a stateful computation is just a
+function that takes an initial state and returns a result, together with a new
+state.</p>
+</blockquote>
+<p>Let's break it down in smaller steps:</p>
+<ol>
+<li>The input stateful computation <code>h</code> is run with input state <code>s</code>, resulting in
+the computation's result <code>a</code> and a new state <code>newState</code>.</li>
+<li><code>f</code> is applied to <code>a</code> obtaining a new stateful computation <code>g</code></li>
+<li><code>g</code> is run on <code>newState</code> obtaining our result</li>
+<li>Everything is wrapped in <code>State</code></li>
+</ol>
+<pre style="background-color:#0f1419;color:#bfbab0;"><code><span>g:                           state -&gt; (finalResult, finalState)
+</span><span>f:                input -&gt; g  ^
+</span><span>                    ^         |
+</span><span>h: initialState -&gt; (a, newState)
+</span><span>     ^
+</span><span>     |
+</span><span>s: --+
+</span></code></pre>
+<p>This graph might help you see how the resulting stateful computation is
+something that takes a state <code>s</code> and returns <code>(finalResult, finalState)</code>.</p>
+<p>Let's try with another example:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">type </span><span style="color:#f29718;">Stack </span><span style="color:#f29668;">=</span><span> [</span><span style="color:#f29718;">Int</span><span>]
+</span><span>
+</span><span style="color:#ffb454;">pop </span><span style="color:#ff7733;">:: State Stack Int
+</span><span>pop </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do </span><span style="font-style:italic;color:#5c6773;">-- or State $ \(x:xs) -&gt; (x, xs)
+</span><span>  (x</span><span style="color:#f29668;">:</span><span>xs) </span><span style="color:#f29668;">&lt;-</span><span> get
+</span><span>  put xs
+</span><span>  return x
+</span><span>
+</span><span style="color:#ffb454;">push </span><span style="color:#ff7733;">:: Int -&gt; State Stack </span><span style="font-style:italic;color:#f29668;">()
+</span><span>push x </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do </span><span style="font-style:italic;color:#5c6773;">-- or State $ \xs -&gt; ((), x:xs)
+</span><span>  modify (x</span><span style="color:#f29668;">:</span><span>)
+</span><span>
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> runState (push </span><span style="color:#f29718;">0 </span><span style="color:#f29668;">&gt;&gt;</span><span> push </span><span style="color:#f29718;">1 </span><span style="color:#f29668;">&gt;&gt;</span><span> push </span><span style="color:#f29718;">2 </span><span style="color:#f29668;">&gt;&gt;</span><span> pop </span><span style="color:#f29668;">&gt;&gt;</span><span> pop </span><span style="color:#f29668;">&gt;&gt;</span><span> push </span><span style="color:#f29718;">3</span><span>) </span><span style="color:#f29718;">[]
+</span><span>(</span><span style="color:#f29718;">()</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29718;">3</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">0</span><span>])
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> runState (pop </span><span style="color:#f29668;">&gt;&gt;=</span><span> (</span><span style="color:#f29668;">\</span><span>x </span><span style="color:#f29668;">-&gt;</span><span> return </span><span style="color:#f29668;">$</span><span> show x </span><span style="color:#f29668;">++ </span><span style="color:#c2d94c;">&quot; kebabs&quot;</span><span>)) [</span><span style="color:#f29718;">10</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">9</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">8</span><span>]
+</span><span>(</span><span style="color:#c2d94c;">&quot;10 kebabs&quot;</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29718;">9</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">8</span><span>])
+</span><span>ghci</span><span style="color:#f29668;">&gt;</span><span> runState (pop </span><span style="color:#f29668;">&gt;&gt;=</span><span> push) [</span><span style="color:#f29718;">42</span><span>]
+</span><span>(</span><span style="color:#f29718;">()</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29718;">42</span><span>])
+</span></code></pre>
+<p>Let's consider the last example where we combine a <code>pop</code> with a <code>push</code>. If we
+analyze what's going on step by step we see that the definiton for the bind
+operator <code>&gt;&gt;=</code> actually makes sense.</p>
+<ol>
+<li>The result has to be a stateful computation that takes a state <code>s</code> to run,
+hence <code>State $ \s -&gt; ...</code>.</li>
+<li>We run <code>pop</code> on <code>s</code> obtaining <code>(head s, tail s)</code></li>
+<li>We pass <code>head s</code> to <code>push</code> which gives us stateful computation <code>g</code>. To run <code>g</code> we
+pass it <code>tail s</code>, the state provided by <code>pop</code>, obtaining <code>((), (head s) : (tail s))</code>.</li>
+<li>So, <code>pop &gt;&gt;= push</code> is the same as <code>\s -&gt; ((), (head s) : (tail s))</code>. If we
+substitute <code>s</code> with stack <code>[42]</code> we get</li>
+</ol>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>(</span><span style="color:#f29718;">()</span><span style="color:#bfbab0cc;">,</span><span> (head [</span><span style="color:#f29718;">42</span><span>]) </span><span style="color:#f29668;">:</span><span> (tail [</span><span style="color:#f29718;">42</span><span>]))
+</span><span>(</span><span style="color:#f29718;">()</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">42 </span><span style="color:#f29668;">: </span><span style="color:#f29718;">[]</span><span>)
+</span><span>(</span><span style="color:#f29718;">()</span><span style="color:#bfbab0cc;">,</span><span> [</span><span style="color:#f29718;">42</span><span>])
+</span></code></pre>
+<p>The state monad is admitedly more complicated that the monads we have seen so
+far, but hopefully you should be able to employ it your programs, even if you
+haven't fully grasped it.</p>
+<h1 id="aoc-2022-day-9">AoC 2022 Day 9</h1>
+<p>We have finally made it to this final section. It's time to put our newly
+acquired Haskell skills to the test by tackling <a href="https://adventofcode.com/2022/day/9">Advent of Code 2022 day
+9</a>.</p>
+<p>In this exercise we have to simulate the behaviour of a rope with two knots,
+one at each side. The positions of the knots can be models
+on a two-dimensional grid. The tail can never be further that one cell from
+the head. When that happens the tail is pulled towards the head accordingly to
+the rules specified in details in the exercise's description.
+We are given as input a list of moves which tell us in which direction and for
+how many cells the rope's head is pulled. Here's a sample input:</p>
+<pre style="background-color:#0f1419;color:#bfbab0;"><code><span>R 4
+</span><span>U 4
+</span><span>L 3
+</span><span>D 1
+</span><span>R 4
+</span><span>D 1
+</span><span>L 5
+</span><span>R 2
+</span></code></pre>
+<p>Our task is to find out how many unique cells the rope's tail visits during the
+complete series of motions. Let's go!</p>
+<h2 id="data-modeling">Data modeling</h2>
+<p>The first thing we wanna do is decide on our data representation.</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">type </span><span style="color:#f29718;">Pos </span><span style="color:#f29668;">=</span><span> (</span><span style="color:#f29718;">Int</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">Int</span><span>)
+</span><span style="color:#ff7733;">type </span><span style="color:#f29718;">Rope </span><span style="color:#f29668;">=</span><span> [</span><span style="color:#f29718;">Pos</span><span>]
+</span><span>
+</span><span style="color:#ff7733;">data </span><span style="color:#f29718;">Dir </span><span style="color:#f29668;">= </span><span style="color:#f29718;">U </span><span style="color:#f29668;">| </span><span style="color:#f29718;">D </span><span style="color:#f29668;">| </span><span style="color:#f29718;">L </span><span style="color:#f29668;">| </span><span style="color:#f29718;">R </span><span style="color:#ff7733;">deriving</span><span> (</span><span style="text-decoration:underline;color:#59c2ff;">Show</span><span>)
+</span><span style="color:#ff7733;">data </span><span style="color:#f29718;">Move </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Move Dir Int </span><span style="color:#ff7733;">deriving</span><span> (</span><span style="text-decoration:underline;color:#59c2ff;">Show</span><span>)
+</span></code></pre>
+<p>We model 2D coordinates with <code>Pos</code>, an alias for <code>(Int, Int)</code>. Then, we can
+model the rope as a list of <code>Pos</code>s. A <code>Move</code> is just a <code>Dir</code> (up, down, left, or
+right) and the amount of cells. <code>deriving (Show)</code> is used to automatically make
+our type an instance of <code>Show</code>.</p>
+<h2 id="parsing-the-input">Parsing the input</h2>
+<p>For parsing we are gonna use
+<a href="https://hackage.haskell.org/package/attoparsec">attoparsec</a>, a fast and
+simple parser combinator library. Attoparsec provides us some primitive parsing
+functions (such as <code>char</code> to parse a given character, or <code>endOfLine</code> to parse a
+new line character) and some combinators (such as <code>many1</code> to apply a parser at
+least one time). Through the combinations of parsing functions and parser
+combinators we are going to define a complex parser that will consume the
+exercise's input into a list of <code>Move</code>s, or will fail to do so. Let's give it a
+go:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">import </span><span>Data.Attoparsec.Text (..)
+</span><span style="color:#ff7733;">import </span><span>Control.Applicative (</span><span style="color:#ffb454;">(&lt;|&gt;)</span><span>)
+</span><span>
+</span><span style="color:#ffb454;">inputParser </span><span style="color:#ff7733;">:: Parser</span><span> [</span><span style="color:#ff7733;">Move</span><span>]
+</span><span>inputParser </span><span style="color:#f29668;">=</span><span> move </span><span style="color:#f29668;">`sepBy`</span><span> endOfLine
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    move </span><span style="color:#f29668;">=</span><span> liftA2 </span><span style="color:#f29718;">Move</span><span> dir step
+</span><span>    step </span><span style="color:#f29668;">=</span><span> char </span><span style="color:#c2d94c;">&#39; &#39;</span><span> *</span><span style="color:#f29668;">&gt;</span><span> decimal
+</span><span>    dir </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>      c </span><span style="color:#f29668;">&lt;-</span><span> (char </span><span style="color:#c2d94c;">&#39;U&#39; </span><span style="color:#f29668;">&lt;|&gt;</span><span> char </span><span style="color:#c2d94c;">&#39;D&#39; </span><span style="color:#f29668;">&lt;|&gt;</span><span> char </span><span style="color:#c2d94c;">&#39;L&#39; </span><span style="color:#f29668;">&lt;|&gt;</span><span> char </span><span style="color:#c2d94c;">&#39;R&#39;</span><span>)
+</span><span>      </span><span style="color:#ff7733;">case</span><span> c </span><span style="color:#ff7733;">of
+</span><span>        </span><span style="color:#c2d94c;">&#39;U&#39; </span><span style="color:#f29668;">-&gt;</span><span> return </span><span style="color:#f29718;">U
+</span><span>        </span><span style="color:#c2d94c;">&#39;D&#39; </span><span style="color:#f29668;">-&gt;</span><span> return </span><span style="color:#f29718;">D
+</span><span>        </span><span style="color:#c2d94c;">&#39;L&#39; </span><span style="color:#f29668;">-&gt;</span><span> return </span><span style="color:#f29718;">L
+</span><span>        </span><span style="color:#c2d94c;">&#39;R&#39; </span><span style="color:#f29668;">-&gt;</span><span> return </span><span style="color:#f29718;">R
+</span></code></pre>
+<p>Hopefully it shouldn't be too hard to understand what's going on here.
+<code>inputParser</code> is the parser we define to parse our input. It's defined using the
+<code>sepBy</code> combinator, which applies the <code>move</code> parser as many times as it can,
+consuming everytime a new line character as separator.</p>
+<p><code>sepBy</code> returns a list of all
+the values returned by <code>move</code>, which is a parser that simply combines the
+results of parsers <code>dir</code> and <code>step</code>, constructing a <code>Move</code>. <code>step</code> consumes a <code>' '</code> and parses a decimal number. <code>dir</code> parses a direction out of a character.
+Besides parsers and combinators we see some new faces in this code:</p>
+<ul>
+<li><code>(*&gt;)</code> is the same as <code>(&gt;&gt;)</code> but using a functorial context instead of a
+monadic one. Is basically used to consume something and ignore it.</li>
+<li><code>(&lt;|&gt;)</code> is the alternative operator. Returns its &quot;successful&quot; operand. For
+instance:</li>
+</ul>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&lt;|&gt; </span><span style="color:#f29718;">Just 2
+</span><span style="color:#f29718;">Just 2
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Just 2 </span><span style="color:#f29668;">&lt;|&gt; </span><span style="color:#f29718;">Nothing
+</span><span style="color:#f29718;">Just 2
+</span><span>ghci</span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">&lt;|&gt; </span><span style="color:#f29718;">Nothing
+</span><span style="color:#f29718;">Nothing
+</span></code></pre>
+<p>Let's wire up our parser to the code that retrieves the input:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">main </span><span style="color:#ff7733;">:: IO </span><span style="font-style:italic;color:#f29668;">()
+</span><span>main </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  rawInput </span><span style="color:#f29668;">&lt;-</span><span> pack </span><span style="color:#f29668;">.</span><span> (</span><span style="color:#f29668;">++ </span><span style="color:#c2d94c;">&quot; &quot;</span><span>) </span><span style="color:#f29668;">&lt;$&gt;</span><span> readFile </span><span style="color:#c2d94c;">&quot;./input.txt&quot;
+</span><span>  </span><span style="color:#ff7733;">let</span><span> input </span><span style="color:#f29668;">=</span><span> maybeResult </span><span style="color:#f29668;">$</span><span> parse inputParser rawInput
+</span><span>  </span><span style="color:#ff7733;">case</span><span> input </span><span style="color:#ff7733;">of
+</span><span>    </span><span style="color:#f29718;">Just</span><span> input </span><span style="color:#f29668;">-&gt;</span><span> print </span><span style="color:#f29668;">$</span><span> part1 input
+</span><span>    </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">-&gt;</span><span> putStrLn </span><span style="color:#c2d94c;">&quot;Failed to parse input!&quot;
+</span><span>  return </span><span style="color:#f29718;">()
+</span><span>
+</span><span style="color:#ffb454;">part1 </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt; Int
+</span><span>part1 _ </span><span style="color:#f29668;">= </span><span style="color:#f29718;">0
+</span></code></pre>
+<p>In our main function we read our whole input from file <code>input.txt</code>, then we append a
+space at the very end and we <code>pack</code> it into a <code>Text</code> value. We use our
+<code>inputParser</code> to parse our <code>Text</code> input, converting it into a <code>Maybe</code>. If we managed
+to correctly parse the input we pass it to <code>part1</code> and we print its result.</p>
+<h2 id="moving-the-rope">Moving the rope</h2>
+<p>Let's define some utility functions in order to make our life easier:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">(.:) </span><span style="color:#f29668;">::</span><span> (c </span><span style="color:#f29668;">-&gt;</span><span> d) </span><span style="color:#f29668;">-&gt;</span><span> (a </span><span style="color:#f29668;">-&gt;</span><span> b </span><span style="color:#f29668;">-&gt;</span><span> c) </span><span style="color:#f29668;">-&gt;</span><span> a </span><span style="color:#f29668;">-&gt;</span><span> b </span><span style="color:#f29668;">-&gt;</span><span> d
+</span><span style="color:#ffb454;">(.:)</span><span> f g x y </span><span style="color:#f29668;">=</span><span> f (g x y)
+</span><span>
+</span><span style="color:#ffb454;">dist </span><span style="color:#ff7733;">:: Pos -&gt; Pos -&gt; Pos
+</span><span>dist (dx</span><span style="color:#bfbab0cc;">,</span><span> dy) (sx</span><span style="color:#bfbab0cc;">,</span><span> sy) </span><span style="color:#f29668;">=</span><span> (dx </span><span style="color:#f29668;">-</span><span> sx</span><span style="color:#bfbab0cc;">,</span><span> dy </span><span style="color:#f29668;">-</span><span> sy)
+</span><span>
+</span><span style="color:#ffb454;">absDist </span><span style="color:#ff7733;">:: Pos -&gt; Pos -&gt; Pos
+</span><span>absDist </span><span style="color:#f29668;">=</span><span> absPos </span><span style="color:#f29668;">.:</span><span> dist
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    absPos (x</span><span style="color:#bfbab0cc;">,</span><span> y) </span><span style="color:#f29668;">=</span><span> (abs x</span><span style="color:#bfbab0cc;">,</span><span> abs y)
+</span><span>
+</span><span style="color:#ffb454;">normDist </span><span style="color:#ff7733;">:: Pos -&gt; Pos -&gt; Pos
+</span><span>normDist </span><span style="color:#f29668;">=</span><span> normPos </span><span style="color:#f29668;">.:</span><span> dist
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    normPos (x</span><span style="color:#bfbab0cc;">,</span><span> y) </span><span style="color:#f29668;">=</span><span> (signum x</span><span style="color:#bfbab0cc;">,</span><span> signum y)
+</span><span>
+</span><span style="color:#ffb454;">kingDistance </span><span style="color:#ff7733;">:: Pos -&gt; Pos -&gt; Int
+</span><span>kingDistance </span><span style="color:#f29668;">=</span><span> uncurry max </span><span style="color:#f29668;">.:</span><span> absDist
+</span><span>
+</span><span style="color:#ffb454;">mkRope </span><span style="color:#ff7733;">:: Rope
+</span><span>mkRope </span><span style="color:#f29668;">=</span><span> replicate </span><span style="color:#f29718;">2</span><span> (</span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">0</span><span>)
+</span><span>
+</span><span style="color:#ffb454;">movesToSteps </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt;</span><span> [</span><span style="color:#ff7733;">Pos</span><span>]
+</span><span>movesToSteps moves </span><span style="color:#f29668;">=</span><span> dirToPos </span><span style="color:#f29668;">&lt;$&gt;</span><span> concatMap moveToSteps moves
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    moveToSteps (</span><span style="color:#f29718;">Move</span><span> dir step) </span><span style="color:#f29668;">=</span><span> replicate step dir
+</span><span>
+</span><span style="color:#ffb454;">dirToPos </span><span style="color:#ff7733;">:: Dir -&gt; Pos
+</span><span>dirToPos dir </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">case</span><span> dir </span><span style="color:#ff7733;">of
+</span><span>  </span><span style="color:#f29718;">U </span><span style="color:#f29668;">-&gt;</span><span> (</span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">1</span><span>)
+</span><span>  </span><span style="color:#f29718;">D </span><span style="color:#f29668;">-&gt;</span><span> (</span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span>)
+</span><span>  </span><span style="color:#f29718;">L </span><span style="color:#f29668;">-&gt;</span><span> (</span><span style="color:#f29668;">-</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">0</span><span>)
+</span><span>  </span><span style="color:#f29718;">R </span><span style="color:#f29668;">-&gt;</span><span> (</span><span style="color:#f29718;">1</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">0</span><span>)
+</span><span>
+</span><span style="color:#ffb454;">sumPos </span><span style="color:#ff7733;">:: Pos -&gt; Pos -&gt; Pos
+</span><span>sumPos (x1</span><span style="color:#bfbab0cc;">,</span><span> y1) (x2</span><span style="color:#bfbab0cc;">,</span><span> y2) </span><span style="color:#f29668;">=</span><span> (x1 </span><span style="color:#f29668;">+</span><span> x2</span><span style="color:#bfbab0cc;">,</span><span> y1 </span><span style="color:#f29668;">+</span><span> y2)
+</span></code></pre>
+<p>Nothing too crazy going on. <code>(.:)</code> composes a function that takes one argument
+with one that takes two. <code>movesToSteps</code> transforms a list of <code>Move</code>s into a list
+of unit <code>Pos</code>s, splitting each <code>Move</code> into multiple unit steps. <code>kingDistance</code>
+returns the number of moves a chess king would have to take to travel from one
+position to another.</p>
+<p>Let's move on to the heart of this problem. We have to move the rope and keep
+track of all the unique cells the tail visits. To avoid counting duplicate cells
+we are going to use a <code>Set</code>. Here we go:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ff7733;">import qualified </span><span>Data.Set </span><span style="color:#ff7733;">as </span><span>Set
+</span><span>
+</span><span style="color:#ffb454;">part1 </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt; Int
+</span><span>part1 </span><span style="color:#f29668;">=</span><span> simulateRope mkRope
+</span><span>
+</span><span style="color:#ffb454;">simulateRope </span><span style="color:#ff7733;">:: Rope -&gt;</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt; Int
+</span><span>simulateRope rope moves </span><span style="color:#f29668;">=
+</span><span>  </span><span style="color:#f29718;">Set</span><span style="color:#f29668;">.</span><span>size
+</span><span>    </span><span style="color:#f29668;">.</span><span> flip evalState rope
+</span><span>    </span><span style="color:#f29668;">.</span><span> foldM moveRope </span><span style="color:#f29718;">Set</span><span style="color:#f29668;">.</span><span>empty
+</span><span>    </span><span style="color:#f29668;">$</span><span> movesToSteps moves
+</span><span>
+</span><span style="color:#ff7733;">type </span><span style="color:#f29718;">TailPos </span><span style="color:#f29668;">= </span><span style="color:#f29718;">Set</span><span style="color:#f29668;">.</span><span style="color:#f29718;">Set Pos
+</span><span>
+</span><span style="color:#ffb454;">moveRope </span><span style="color:#ff7733;">:: TailPos -&gt; Pos -&gt; State Rope TailPos
+</span><span>moveRope tailPos dir </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  rope </span><span style="color:#f29668;">&lt;-</span><span> get
+</span><span>  </span><span style="color:#ff7733;">let</span><span> (h </span><span style="color:#f29668;">:</span><span> body) </span><span style="color:#f29668;">=</span><span> rope
+</span><span>  </span><span style="color:#ff7733;">let</span><span> newHead </span><span style="color:#f29668;">=</span><span> sumPos h dir
+</span><span>  </span><span style="color:#ff7733;">let</span><span> newRope </span><span style="color:#f29668;">=</span><span> scanl takeStep newHead body
+</span><span>  put newRope
+</span><span>  return </span><span style="color:#f29668;">$ </span><span style="color:#f29718;">Set</span><span style="color:#f29668;">.</span><span>insert (last newRope) tailPos
+</span><span>  </span><span style="color:#ff7733;">where
+</span><span>    takeStep dst src </span><span style="color:#f29668;">=
+</span><span>      </span><span style="color:#ff7733;">if</span><span> kingDistance dst src </span><span style="color:#f29668;">&gt; </span><span style="color:#f29718;">1
+</span><span>        </span><span style="color:#ff7733;">then</span><span> sumPos src </span><span style="color:#f29668;">$</span><span> normDist dst src
+</span><span>        </span><span style="color:#ff7733;">else</span><span> src
+</span></code></pre>
+<p>Let's start with <code>moveRope</code>. From its type signature we see that it's a stateful
+computation that returns the set of all the positions the tail visited, whilst
+keeping track of the rope's state. To move the rope by <code>dir</code>, <code>moveRope</code>
+calculates the new rope's head position and uses that to compute the position of
+all other knots (in this case just another one, <em>wink wink</em>) with <code>scanl</code>.
+The knots are moved with <code>takeStep</code> function, that encapsulate all the rules
+provided by the exercise. After the new rope has been computed the tail's
+position is added to the set.</p>
+<p>Moving on to <code>simulateRope</code>. We map the list of moves to the lists of all unit
+steps. We fold over this lists with <code>moveRope</code> starting with an empty set for
+the tail's positions. The stateful computation returning from <code>foldM</code> is
+evaluated by providing it the initial state of the rope. The result of the
+computation is the set of all the unique positions the tail visited and the
+result of our exercise is the size of this set. Nice!</p>
+<p>Running the code on my input, I get the answer <code>6642</code> which earns me a ⭐.</p>
+<h2 id="part-2">Part 2</h2>
+<p>The second part of the problem is gonna be a breeze. The rope now has <code>10</code> knots
+instead of just <code>2</code>. Let's fix that:</p>
+<pre data-lang="haskell" style="background-color:#0f1419;color:#bfbab0;" class="language-haskell "><code class="language-haskell" data-lang="haskell"><span style="color:#ffb454;">main </span><span style="color:#ff7733;">:: IO </span><span style="font-style:italic;color:#f29668;">()
+</span><span>main </span><span style="color:#f29668;">= </span><span style="color:#ff7733;">do
+</span><span>  rawInput </span><span style="color:#f29668;">&lt;-</span><span> pack </span><span style="color:#f29668;">.</span><span> (</span><span style="color:#f29668;">++ </span><span style="color:#c2d94c;">&quot; &quot;</span><span>) </span><span style="color:#f29668;">&lt;$&gt;</span><span> readFile </span><span style="color:#c2d94c;">&quot;./input.txt&quot;
+</span><span>  </span><span style="color:#ff7733;">let</span><span> input </span><span style="color:#f29668;">=</span><span> maybeResult </span><span style="color:#f29668;">$</span><span> parse inputParser rawInput
+</span><span>  </span><span style="color:#ff7733;">case</span><span> input </span><span style="color:#ff7733;">of
+</span><span>    </span><span style="color:#f29718;">Just</span><span> input </span><span style="color:#f29668;">-&gt; </span><span style="color:#ff7733;">do
+</span><span>      print (part1 input)
+</span><span>      print (part2 input) </span><span style="font-style:italic;color:#5c6773;">-- 👈 new
+</span><span>    </span><span style="color:#f29718;">Nothing </span><span style="color:#f29668;">-&gt;</span><span> putStrLn </span><span style="color:#c2d94c;">&quot;Failed to parse input!&quot;
+</span><span>  return </span><span style="color:#f29718;">()
+</span><span>
+</span><span style="color:#ffb454;">part1 </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt; Int
+</span><span>part1 </span><span style="color:#f29668;">=</span><span> simulateRope (mkRope </span><span style="color:#f29718;">2</span><span>) </span><span style="font-style:italic;color:#5c6773;">-- 👈 updated
+</span><span>
+</span><span style="color:#ffb454;">part2 </span><span style="color:#ff7733;">::</span><span> [</span><span style="color:#ff7733;">Move</span><span>] </span><span style="color:#ff7733;">-&gt; Int
+</span><span>part2 </span><span style="color:#f29668;">=</span><span> simulateRope (mkRope </span><span style="color:#f29718;">10</span><span>)
+</span><span>
+</span><span style="color:#ffb454;">mkRope </span><span style="color:#ff7733;">:: Int -&gt; Rope
+</span><span>mkRope </span><span style="color:#f29668;">=</span><span> flip replicate (</span><span style="color:#f29718;">0</span><span style="color:#bfbab0cc;">, </span><span style="color:#f29718;">0</span><span>)
+</span></code></pre>
+<p><code>mkRope</code> now takes the length of the rope as argument, and builds the rope by
+replicating the starting position <code>length</code>-times. That's it.
+If you run your program now, you should be presented with solutions for both
+<code>part1</code> and <code>part2</code>. Go get your second ⭐ champ!</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>We did it! We started from scratch and by slowing working our way up, we managed
+to write a pretty damn good solution for one of the problems of Advent of Code.</p>
+<p>Although this article has skipped over lots of important Haskell stuff,
+hopefully you should feel somewhat capable of solving most AoC's exercises on
+your own. If you feel like delving deeper into Haskell, there's plenty of good 
+resources out there. The first that comes to mind are
+<a href="http://learnyouahaskell.com/">Learn You a Haskell For Great Good</a> and
+<a href="https://book.realworldhaskell.org/">Real World Haskell</a>.</p>
+
+        </section>
+
+        
+
+    </article>
+</main>
+
+
+    </div>
+</body>
+
+</html>
